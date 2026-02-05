@@ -1,0 +1,5 @@
+{
+  "name": "NeyroPlan",
+  "description": "A high-fidelity AI assistant interface inspired by Google Gemini, powered by the latest Gemini 3 Flash model for fast and intelligent conversations.",
+  "requestFramePermissions": []
+}
