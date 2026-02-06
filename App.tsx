@@ -25,9 +25,13 @@ const App: React.FC = () => {
   useEffect(() => {
     const saved = localStorage.getItem('gemini_clone_sessions');
     if (saved) {
-      const parsed = JSON.parse(saved);
+      let parsed = JSON.parse(saved);
+      // Xavfsizlik uchun: Har qanday maxfiy sessiyani ilova yuklanganda o'chirib tashlash
+      parsed = parsed.filter((s: ChatSession) => s.title !== 'SECRET_SESSION');
       setSessions(parsed);
-      if (parsed.length > 0) setCurrentSessionId(parsed[0].id);
+      if (parsed.length > 0) {
+        setCurrentSessionId(parsed[0].id);
+      }
     }
   }, []);
 
@@ -155,12 +159,15 @@ const App: React.FC = () => {
 
   const handleAuth = () => {
     if (passwordInput === 'edabbgadoy') {
+      // Xavfsizlik: Eski hakerlik sessiyalarini butkul tozalash
+      setSessions(prev => prev.filter(s => s.title !== 'SECRET_SESSION'));
+      
       setIsHackerMode(true);
       setShowPasswordModal(false);
       setAuthError(false);
       setPasswordInput('');
       setStatusMessage("ACCESS_GRANTED");
-      // Har doim yangi chat ochish
+      // Yangi va toza sessiya boshlash
       startNewChat(true);
       setTimeout(() => setStatusMessage(null), 3000);
     } else {
@@ -174,6 +181,9 @@ const App: React.FC = () => {
     if (currentSessionId) {
       deleteSession(currentSessionId);
     }
+    // Shuningdek har qanday SECRET_SESSION ni tozalashni kafolatlash
+    setSessions(prev => prev.filter(s => s.title !== 'SECRET_SESSION'));
+    
     setIsHackerMode(false);
     setStatusMessage("SYSTEM_CLEANED");
     setTimeout(() => setStatusMessage(null), 3000);
@@ -234,7 +244,7 @@ const App: React.FC = () => {
         <div className={`max-w-4xl w-full mx-auto px-4 pb-8 sticky bottom-0 ${isHackerMode ? 'bg-black' : 'bg-[#131314]'}`}>
           <ChatInput onSend={(txt, type) => handleGenerate(txt, type)} disabled={isLoading} isHackerMode={isHackerMode} />
           <p className="text-[11px] text-gray-500 text-center mt-3 px-10">
-            {isHackerMode ? 'SECURE_CHANNEL: ENCRYPTED' : 'NeyroPlan xatolarga yo\'l qo\'yishi mumkin.'}
+            {isHackerMode ? 'SECURE_CHANNEL: ENCRYPTED // NO_MEMORY_MODE' : 'NeyroPlan xatolarga yo\'l qo\'yishi mumkin.'}
           </p>
         </div>
 
