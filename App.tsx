@@ -26,7 +26,7 @@ const App: React.FC = () => {
     const saved = localStorage.getItem('gemini_clone_sessions');
     if (saved) {
       let parsed = JSON.parse(saved);
-      // Xavfsizlik uchun: Har qanday maxfiy sessiyani ilova yuklanganda o'chirib tashlash
+      // Xavfsizlik: Har qanday saqlanib qolgan maxfiy sessiyani yuklashda o'chirish
       parsed = parsed.filter((s: ChatSession) => s.title !== 'SECRET_SESSION');
       setSessions(parsed);
       if (parsed.length > 0) {
@@ -35,8 +35,10 @@ const App: React.FC = () => {
     }
   }, []);
 
+  // Xavfsizlik: Maxfiy sessiyalarni umuman localStorage'ga yozmaslik
   useEffect(() => {
-    localStorage.setItem('gemini_clone_sessions', JSON.stringify(sessions));
+    const sessionsToSave = sessions.filter(s => s.title !== 'SECRET_SESSION');
+    localStorage.setItem('gemini_clone_sessions', JSON.stringify(sessionsToSave));
   }, [sessions]);
 
   const currentSession = sessions.find(s => s.id === currentSessionId);
@@ -141,7 +143,7 @@ const App: React.FC = () => {
     } catch (error: any) {
       let errorMsg = "Xatolik yuz berdi.";
       if (error.message?.includes("Requested entity was not found")) {
-        errorMsg = "Pullik API kaliti talab qilinadi. Billing yoqilganligini tekshiring.";
+        errorMsg = "Pullik API kaliti talab qilinadi.";
         // @ts-ignore
         window.aistudio.openSelectKey();
       }
@@ -159,15 +161,16 @@ const App: React.FC = () => {
 
   const handleAuth = () => {
     if (passwordInput === 'edabbgadoy') {
-      // Xavfsizlik: Eski hakerlik sessiyalarini butkul tozalash
+      // Xavfsizlik: Kirishdan oldin har qanday maxfiy ma'lumotni tozalash
       setSessions(prev => prev.filter(s => s.title !== 'SECRET_SESSION'));
       
       setIsHackerMode(true);
       setShowPasswordModal(false);
       setAuthError(false);
       setPasswordInput('');
-      setStatusMessage("ACCESS_GRANTED");
-      // Yangi va toza sessiya boshlash
+      setStatusMessage("SESSION_RESET: SECURE_ENVIRONMENT");
+      
+      // Mutlaqo yangi sessiya
       startNewChat(true);
       setTimeout(() => setStatusMessage(null), 3000);
     } else {
@@ -177,15 +180,12 @@ const App: React.FC = () => {
   };
 
   const exitHackerMode = () => {
-    // Chiqishda hamma hakerlik izlarini o'chirish
-    if (currentSessionId) {
-      deleteSession(currentSessionId);
-    }
-    // Shuningdek har qanday SECRET_SESSION ni tozalashni kafolatlash
+    // Chiqishda hamma hakerlik izlarini o'chirish (Memory wipe)
     setSessions(prev => prev.filter(s => s.title !== 'SECRET_SESSION'));
+    setCurrentSessionId(null);
     
     setIsHackerMode(false);
-    setStatusMessage("SYSTEM_CLEANED");
+    setStatusMessage("VOLATILE_MEMORY_PURGED");
     setTimeout(() => setStatusMessage(null), 3000);
   };
 
@@ -196,7 +196,7 @@ const App: React.FC = () => {
     if (newCount === 3) {
       setIsBlackout(false);
       setClickCount(0);
-      setStatusMessage("Xush kelibsiz");
+      setStatusMessage("SYSTEM_RESTORED");
       setTimeout(() => setStatusMessage(null), 3000);
     } else {
       clickTimer.current = setTimeout(() => setClickCount(0), 500);
@@ -225,16 +225,16 @@ const App: React.FC = () => {
                 </svg>
               </button>
             )}
-            <div className={`text-xl font-medium transition-colors ${isHackerMode ? 'text-green-500 font-mono' : 'text-gray-200'}`}>
-              {isHackerMode ? 'SHADOW_AI://TERMINAL' : 'NeyroPlan'}
+            <div className={`text-xl font-medium transition-colors ${isHackerMode ? 'text-green-500 font-mono tracking-tighter' : 'text-gray-200'}`}>
+              {isHackerMode ? 'SHADOW_AI://INCUBATOR' : 'NeyroPlan'}
             </div>
           </div>
           {statusMessage && (
-            <div className={`absolute left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-[10px] animate-pulse border z-50 shadow-xl ${isHackerMode ? 'bg-green-950 text-green-400 border-green-700' : 'bg-[#1e1f20] text-blue-400 border-blue-900'}`}>
+            <div className={`absolute left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-[10px] animate-pulse border z-50 shadow-2xl ${isHackerMode ? 'bg-green-950 text-green-400 border-green-700' : 'bg-[#1e1f20] text-blue-400 border-blue-900'}`}>
               {statusMessage}
             </div>
           )}
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${isHackerMode ? 'bg-green-900 text-green-400 border border-green-500' : 'bg-blue-600 text-white'}`}>
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${isHackerMode ? 'bg-green-900 text-green-400 border border-green-500 shadow-[0_0_10px_rgba(34,197,94,0.3)]' : 'bg-blue-600 text-white'}`}>
             {isHackerMode ? '?' : 'U'}
           </div>
         </header>
@@ -244,7 +244,7 @@ const App: React.FC = () => {
         <div className={`max-w-4xl w-full mx-auto px-4 pb-8 sticky bottom-0 ${isHackerMode ? 'bg-black' : 'bg-[#131314]'}`}>
           <ChatInput onSend={(txt, type) => handleGenerate(txt, type)} disabled={isLoading} isHackerMode={isHackerMode} />
           <p className="text-[11px] text-gray-500 text-center mt-3 px-10">
-            {isHackerMode ? 'SECURE_CHANNEL: ENCRYPTED // NO_MEMORY_MODE' : 'NeyroPlan xatolarga yo\'l qo\'yishi mumkin.'}
+            {isHackerMode ? 'CRITICAL: VOLATILE_STORAGE_ONLY // NO_PERSISTENCE' : 'NeyroPlan xatolarga yo\'l qo\'yishi mumkin.'}
           </p>
         </div>
 
@@ -267,26 +267,26 @@ const App: React.FC = () => {
 
         {isBlackout && (
           <div className="fixed inset-0 bg-black z-[200] cursor-none flex items-center justify-center" onClick={handleBlackoutClick}>
-            <div className="opacity-0 text-green-900 font-mono text-[8px]">SYSTEM_OFFLINE</div>
+            <div className="opacity-0 text-green-900 font-mono text-[8px]">ENCRYPTED_BLACKOUT</div>
           </div>
         )}
 
         {showPasswordModal && (
-          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[100] backdrop-blur-sm">
-            <div className={`p-8 rounded-2xl border-2 max-w-sm w-full transition-all ${authError ? 'border-red-600 bg-red-950/20' : 'border-gray-800 bg-[#1e1f20]'}`}>
-              <h2 className="text-xl font-medium text-white mb-6 text-center">Tizimga kirish</h2>
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[100] backdrop-blur-md">
+            <div className={`p-8 rounded-2xl border-2 max-w-sm w-full transition-all duration-500 ${authError ? 'border-red-600 bg-red-950/20 scale-95' : 'border-gray-800 bg-[#1e1f20]'}`}>
+              <h2 className="text-xl font-medium text-white mb-6 text-center">Xavfsiz terminalga kirish</h2>
               <input 
                 type="password"
                 autoFocus
                 value={passwordInput}
                 onChange={(e) => setPasswordInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleAuth()}
-                placeholder="Parol..."
-                className="w-full bg-[#131314] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 mb-6 text-center"
+                placeholder="Identifikator..."
+                className="w-full bg-[#131314] border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 mb-6 text-center tracking-[0.5em]"
               />
               <div className="flex gap-3">
                 <button onClick={() => setShowPasswordModal(false)} className="flex-1 px-4 py-2 text-gray-400 hover:text-white transition-colors">Bekor qilish</button>
-                <button onClick={handleAuth} className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl font-medium transition-colors">Kirish</button>
+                <button onClick={handleAuth} className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl font-medium transition-all active:scale-95">Kirish</button>
               </div>
             </div>
           </div>
