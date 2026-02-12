@@ -37,88 +37,64 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, disabled, isHacker
     }
   }, [text]);
 
-  const modeStyles = {
-    text: isHackerMode ? 'border-green-800' : 'border-transparent',
-    image: isHackerMode ? 'border-green-400' : 'border-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.2)]',
-    video: isHackerMode ? 'border-red-400' : 'border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.2)]'
-  };
+  const containerClass = isHackerMode 
+    ? 'bg-red-950/10 border-red-600 shadow-[0_0_15px_rgba(255,0,0,0.2)]' 
+    : 'bg-gray-100 border-transparent focus-within:bg-gray-50 focus-within:shadow-md focus-within:border-gray-200';
+
+  const btnClass = (active: boolean) => isHackerMode
+    ? (active ? 'bg-red-600 text-black shadow-[0_0_10px_#ff0000]' : 'bg-black text-red-900 border border-red-900 hover:border-red-600 hover:text-red-600')
+    : (active ? 'bg-blue-600 text-white' : 'bg-white text-gray-500 hover:bg-gray-200');
 
   return (
-    <div className="space-y-2">
-      <div className="flex gap-2 justify-center mb-1">
-        <button 
-          onClick={() => setMode('text')}
-          className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-            mode === 'text' 
-              ? (isHackerMode ? 'bg-green-600 text-black' : 'bg-blue-600 text-white') 
-              : (isHackerMode ? 'bg-black text-green-700 hover:text-green-500' : 'bg-[#1e1f20] text-gray-400 hover:text-gray-200')
-          }`}
-        >
-          {isHackerMode ? 'ROOT_SHELL' : 'Chat'}
-        </button>
-        <button 
-          onClick={() => setMode('image')}
-          className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-            mode === 'image' 
-              ? (isHackerMode ? 'bg-green-400 text-black' : 'bg-purple-600 text-white') 
-              : (isHackerMode ? 'bg-black text-green-700 hover:text-green-500' : 'bg-[#1e1f20] text-gray-400 hover:text-gray-200')
-          }`}
-        >
-          {isHackerMode ? 'RENDER_IMG' : 'Rasm Yaratish'}
-        </button>
-        <button 
-          onClick={() => setMode('video')}
-          className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-            mode === 'video' 
-              ? (isHackerMode ? 'bg-red-400 text-black' : 'bg-red-600 text-white') 
-              : (isHackerMode ? 'bg-black text-green-700 hover:text-green-500' : 'bg-[#1e1f20] text-gray-400 hover:text-gray-200')
-          }`}
-        >
-          {isHackerMode ? 'GEN_VID' : 'Video Yaratish'}
-        </button>
+    <div className={`relative rounded-[32px] p-2 transition-all border ${containerClass}`}>
+      <div className="flex gap-2 mb-2 px-2">
+        {['text', 'image', 'video'].map((m) => (
+          <button 
+            key={m}
+            onClick={() => setMode(m as any)}
+            className={`px-3 py-1 rounded-full text-[10px] font-medium uppercase tracking-wider transition-all ${
+              isHackerMode ? 'hacker-font' : ''
+            } ${btnClass(mode === m)}`}
+          >
+            {m === 'text' ? (isHackerMode ? 'LINK' : 'Chat') : m === 'image' ? (isHackerMode ? 'VISUAL' : 'Rasm') : (isHackerMode ? 'STREAM' : 'Video')}
+          </button>
+        ))}
       </div>
 
-      <div className={`rounded-[32px] p-2 pr-4 shadow-xl border-2 transition-all duration-300 ${isHackerMode ? 'bg-black' : 'bg-[#1e1f20]'} ${modeStyles[mode]} focus-within:ring-1 ${isHackerMode ? 'focus-within:ring-green-500' : 'focus-within:ring-gray-700'}`}>
-        <div className="flex items-end gap-2 px-2">
-          <button className={`p-3 rounded-full transition-colors ${isHackerMode ? 'hover:bg-green-950 text-green-500' : 'hover:bg-[#28292a] text-gray-300'}`}>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
-          </button>
-          
-          <textarea
-            ref={textareaRef}
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={isHackerMode ? "sh-3.2# query_shadow_ai --input ..." : (mode === 'text' ? "Bu yerga so'rovingizni kiriting" : mode === 'image' ? "Qanday rasm chizib beray?" : "Qanday video yaratay?")}
-            rows={1}
-            disabled={disabled}
-            className={`flex-1 bg-transparent border-none focus:ring-0 py-3 resize-none min-h-[48px] max-h-[200px] text-lg outline-none ${isHackerMode ? 'text-green-500 placeholder-green-900 font-mono' : 'text-gray-200 placeholder-gray-500'}`}
-          />
+      <div className="flex items-end gap-2 px-2 pb-1">
+        <textarea
+          ref={textareaRef}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder={isHackerMode ? "> ENTER_COMMAND_PROMPT..." : (mode === 'text' ? "Xabar yozing..." : "Tavsif yozing...")}
+          rows={1}
+          disabled={disabled}
+          className={`flex-1 bg-transparent border-none focus:ring-0 py-2 px-2 resize-none max-h-[200px] text-[15px] outline-none transition-colors ${
+            isHackerMode ? 'text-red-500 hacker-font placeholder:text-red-900' : 'text-gray-800'
+          }`}
+        />
 
-          <div className="flex items-center gap-1 mb-1">
-            <button className={`p-3 rounded-full transition-colors ${isHackerMode ? 'hover:bg-green-950 text-green-700' : 'hover:bg-[#28292a] text-gray-400'}`}>
-               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" /></svg>
-            </button>
-            
-            {(text.trim() || mode !== 'text') && (
-              <button 
-                onClick={handleSend}
-                disabled={!text.trim() || disabled}
-                className={`p-3 rounded-full text-white transition-all ml-1 shadow-md disabled:opacity-50 ${
-                  isHackerMode 
-                    ? 'bg-green-600 hover:bg-green-400 text-black' 
-                    : (mode === 'text' ? 'bg-[#4285f4]' : mode === 'image' ? 'bg-purple-600' : 'bg-red-600')
-                }`}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-                  <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
-                </svg>
-              </button>
+        <button 
+          onClick={handleSend}
+          disabled={!text.trim() || disabled}
+          className={`p-3 rounded-full transition-all shrink-0 ${
+            isHackerMode 
+              ? 'bg-red-600 text-black shadow-[0_0_15px_#ff0000] hover:bg-red-500 disabled:opacity-30' 
+              : 'bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-20'
+          }`}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            {isHackerMode ? (
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="currentColor" />
+            ) : (
+              <>
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </>
             )}
-          </div>
-        </div>
+          </svg>
+        </button>
       </div>
     </div>
   );

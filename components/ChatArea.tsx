@@ -18,52 +18,53 @@ export const ChatArea: React.FC<ChatAreaProps> = ({ messages, isLoading, isHacke
 
   if (messages.length === 0) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-8">
-        <div className="max-w-2xl w-full text-left space-y-6">
-          <h1 className={`text-5xl font-medium ${isHackerMode ? 'text-green-500 font-mono' : 'gemini-gradient'}`}>
-            {isHackerMode ? 'ACCESS_GRANTED' : 'Salom, foydalanuvchi'}
+      <div className="flex-1 flex flex-col items-center justify-center p-8 text-center relative">
+        <div className="max-w-2xl w-full">
+          <h1 className={`text-5xl font-semibold mb-12 transition-all ${
+            isHackerMode ? 'neon-red-text hacker-font' : 'animated-gradient-text'
+          }`}>
+            {isHackerMode ? '> HOW_CAN_I_SERVE_THE_SHADOW?' : 'Qanday yordam bera olaman?'}
           </h1>
-          <h2 className={`text-5xl font-medium ${isHackerMode ? 'text-green-700 font-mono' : 'text-[#444746]'}`}>
-            {isHackerMode ? '> SHADOW_AI_ONLINE' : 'Bugun sizga qanday yordam bera olaman?'}
-          </h2>
-        </div>
-        
-        {/* Placeholder suggestion cards */}
-        {!isHackerMode && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-12 max-w-4xl w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[
-              { title: "Sayohat rejasini tuzish", desc: "Seul bo'ylab 3 kunlik reja", icon: "✈️" },
-              { title: "Kod yozish", desc: "Python'da qisqa o'yin yarating", icon: "💻" },
-              { title: "Xat yozish", desc: "Ishga kirish uchun xat", icon: "✉️" },
-              { title: "Maslahat olish", desc: "Sog'lom ovqatlanish bo'yicha", icon: "🍎" }
+              { title: isHackerMode ? "CODE_INJECTION" : "Kod yozish", icon: "💻", prompt: "React'da timer komponenti yozib ber" },
+              { title: isHackerMode ? "GENERATE_VISUAL" : "Rasm yaratish", icon: "🎨", prompt: "Futuristik shahar rasmini yarat" },
+              { title: isHackerMode ? "SEARCH_DATA" : "Ma'lumot topish", icon: "🔍", prompt: "Eng baland tog' haqida ma'lumot ber" },
+              { title: isHackerMode ? "SHADOW_IDEAS" : "G'oyalar", icon: "💡", prompt: "YouTube kanal uchun 5ta g'oya ber" }
             ].map((item, idx) => (
-              <div key={idx} className="bg-[#1e1f20] hover:bg-[#28292a] p-4 rounded-xl cursor-pointer transition-colors flex flex-col justify-between min-h-[160px]">
-                <p className="text-sm text-gray-200">{item.title}</p>
-                <div className="flex justify-between items-end">
-                  <span className="text-xs text-gray-400">{item.desc}</span>
-                  <span className="p-2 bg-[#131314] rounded-full text-lg">{item.icon}</span>
-                </div>
+              <div 
+                key={idx} 
+                className={`p-6 rounded-3xl cursor-pointer transition-all border group ${
+                  isHackerMode 
+                    ? 'bg-red-950/10 hover:bg-red-900/20 border-red-900/30' 
+                    : 'bg-gray-50 hover:bg-gray-100 border-gray-100'
+                }`}
+              >
+                <div className="text-2xl mb-2">{item.icon}</div>
+                <p className={`font-medium ${isHackerMode ? 'text-red-500 hacker-font' : 'text-gray-700'}`}>{item.title}</p>
               </div>
             ))}
           </div>
-        )}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className={`flex-1 overflow-y-auto px-4 py-8 ${isHackerMode ? 'font-mono' : ''}`}>
+    <div className="flex-1 overflow-y-auto px-4 py-8">
       <div className="max-w-3xl mx-auto space-y-12">
         {messages.map((msg) => (
           <ChatMessage key={msg.id} message={msg} isHackerMode={isHackerMode} />
         ))}
         {isLoading && (
           <div className="flex gap-4">
-             <div className={`w-8 h-8 rounded-full shrink-0 animate-pulse ${isHackerMode ? 'bg-green-900' : 'bg-[#1e1f20]'}`} />
-             <div className="space-y-2 flex-1">
-                <div className={`h-4 rounded w-3/4 animate-pulse ${isHackerMode ? 'bg-green-900' : 'bg-[#1e1f20]'}`} />
-                <div className={`h-4 rounded w-1/2 animate-pulse ${isHackerMode ? 'bg-green-900' : 'bg-[#1e1f20]'}`} />
-             </div>
+            <div className={`w-8 h-8 rounded-full animate-spin ${
+              isHackerMode ? 'bg-red-600 shadow-[0_0_15px_#ff0000]' : 'bg-gradient-to-tr from-blue-400 to-purple-500'
+            }`} />
+            <div className="space-y-2 flex-1">
+              <div className={`h-4 rounded-full w-3/4 animate-pulse ${isHackerMode ? 'bg-red-950/30' : 'bg-gray-100'}`} />
+              <div className={`h-4 rounded-full w-1/2 animate-pulse ${isHackerMode ? 'bg-red-950/30' : 'bg-gray-100'}`} />
+            </div>
           </div>
         )}
         <div ref={bottomRef} />
