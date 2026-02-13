@@ -269,15 +269,15 @@ const App: React.FC = () => {
           </p>
         </div>
 
-        {/* Completely Invisible Secret Mode Eye Trigger (Only visible on hover) */}
+        {/* Completely Invisible Secret Mode Eye Trigger (Only visible on hover) - Slightly Shrunken */}
         <button 
           onClick={() => isHackerMode ? setIsHackerMode(false) : setShowPasswordModal(true)} 
-          className={`absolute bottom-8 right-8 p-5 rounded-full transition-all duration-500 transform hover:scale-125 z-50 opacity-0 hover:opacity-100 ${
+          className={`absolute bottom-6 right-6 p-3 rounded-full transition-all duration-500 transform hover:scale-125 z-50 opacity-0 hover:opacity-100 ${
             isHackerMode ? 'text-red-600 drop-shadow-[0_0_15px_rgba(255,0,0,0.8)]' : 'text-red-500'
           }`}
           aria-label="Secret Access"
         >
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
             <circle cx="12" cy="12" r="3"></circle>
           </svg>
