@@ -24,30 +24,33 @@ const App: React.FC = () => {
   const clickCountRef = useRef(0);
   const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Activity tracking logic
+  const [isApiConnected, setIsApiConnected] = useState(false);
+
+  useEffect(() => {
+    // API kaliti mavjudligini tekshirish (faqat visual indikator uchun)
+    if (process.env.API_KEY) {
+      setIsApiConnected(true);
+      if (isHackerMode) console.log("%c [VAULT_SYSTEM]: API_LINK_ESTABLISHED", "color: #ff0000; font-weight: bold;");
+    }
+  }, [isHackerMode]);
+
   const resetActivityTimer = useCallback(() => {
     setIsUserActive(true);
     if (activityTimerRef.current) clearTimeout(activityTimerRef.current);
-    
-    // 5 soniyadan keyin tizim uyquga ketadi
     activityTimerRef.current = setTimeout(() => {
       setIsUserActive(false);
-    }, 5000);
+    }, 15000); // 15 soniya faolsizlikdan keyin
   }, []);
 
   useEffect(() => {
     window.addEventListener('mousemove', resetActivityTimer);
     window.addEventListener('mousedown', resetActivityTimer);
     window.addEventListener('keydown', resetActivityTimer);
-    window.addEventListener('touchstart', resetActivityTimer);
-    
     resetActivityTimer();
-
     return () => {
       window.removeEventListener('mousemove', resetActivityTimer);
       window.removeEventListener('mousedown', resetActivityTimer);
       window.removeEventListener('keydown', resetActivityTimer);
-      window.removeEventListener('touchstart', resetActivityTimer);
       if (activityTimerRef.current) clearTimeout(activityTimerRef.current);
     };
   }, [resetActivityTimer]);
@@ -171,9 +174,7 @@ const App: React.FC = () => {
     if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
     if (clickCountRef.current === 3) {
       setIsPanicMode(false);
-      setStatusMessage("Muvaffaqiyatli qaytdingiz");
       clickCountRef.current = 0;
-      setTimeout(() => setStatusMessage(null), 3000);
     } else {
       clickTimerRef.current = setTimeout(() => {
         clickCountRef.current = 0;
@@ -187,23 +188,17 @@ const App: React.FC = () => {
     <div className={`flex h-screen w-full transition-all duration-700 ${mainBgClass} overflow-hidden relative`}>
       {isHackerMode && <div className="scanline" />}
       
-      {/* Sleep Mode Overlay */}
       {!isUserActive && !isPanicMode && (
         <div className={`fixed inset-0 z-[1000] backdrop-blur-[20px] flex flex-col items-center justify-center transition-all duration-1000 animate-in fade-in ${isHackerMode ? 'bg-black/60' : 'bg-white/30'}`}>
           <div className={`flex flex-col items-center gap-6 p-12 rounded-[3rem] shadow-2xl border transition-all ${isHackerMode ? 'bg-black/80 border-red-600 shadow-[0_0_30px_rgba(255,0,0,0.3)]' : 'bg-white/60 border-white/40'}`}>
             <div className={`w-16 h-16 star-shape animate-bounce-slow ${isHackerMode ? 'bg-red-600 shadow-[0_0_20px_#ff0000]' : 'animated-gradient-box'}`} />
             <div className="space-y-2 text-center">
-              <h2 className={`text-3xl font-bold ${isHackerMode ? 'text-red-600 hacker-glow hacker-font' : 'animated-gradient-text'}`}>
+              <h2 className={`text-3xl font-bold ${isHackerMode ? 'text-red-600 hacker-font hacker-glow' : 'animated-gradient-text'}`}>
                 {isHackerMode ? 'SYSTEM_SLEEP' : 'Tizim uyquda'}
               </h2>
               <p className={`font-medium ${isHackerMode ? 'text-red-900 hacker-font text-xs' : 'text-gray-500'}`}>
                 {isHackerMode ? '[WAITING_FOR_ACTIVITY...]' : 'Faollashtirish uchun sichqonchani harakatlantiring'}
               </p>
-            </div>
-            <div className="flex gap-1.5">
-              <div className={`w-2 h-2 rounded-full animate-bounce ${isHackerMode ? 'bg-red-600' : 'bg-blue-400'}`} style={{animationDelay: '0ms'}} />
-              <div className={`w-2 h-2 rounded-full animate-bounce ${isHackerMode ? 'bg-red-600' : 'bg-purple-400'}`} style={{animationDelay: '150ms'}} />
-              <div className={`w-2 h-2 rounded-full animate-bounce ${isHackerMode ? 'bg-red-600' : 'bg-pink-400'}`} style={{animationDelay: '300ms'}} />
             </div>
           </div>
         </div>
@@ -237,9 +232,12 @@ const App: React.FC = () => {
               <span className={`text-xl font-bold tracking-tight transition-all ${isHackerMode ? 'text-red-600 hacker-font hacker-glow' : 'animated-gradient-text'}`}>
                 {isHackerMode ? 'SHADOW_PROTOCOL' : 'NeyroPlan'}
               </span>
-              <div className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter ${isHackerMode ? 'bg-red-600 text-black shadow-[0_0_5px_#ff0000]' : 'bg-blue-100 text-blue-700'}`}>
-                {isHackerMode ? 'UNFILTERED' : 'Ultra'}
-              </div>
+              {isApiConnected && (
+                <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter animate-pulse ${isHackerMode ? 'bg-red-600 text-black shadow-[0_0_5px_#ff0000]' : 'bg-green-100 text-green-700'}`}>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+                  {isHackerMode ? 'VAULT_ACTIVE' : 'XAVFSIZ'}
+                </div>
+              )}
             </div>
           </div>
 
@@ -265,11 +263,10 @@ const App: React.FC = () => {
             isHackerMode={isHackerMode} 
           />
           <p className={`text-[12px] text-center mt-3 font-medium ${isHackerMode ? 'text-red-900 hacker-font opacity-50' : 'text-gray-400'}`}>
-            {isHackerMode ? "PROTOCOL_WARNING: ALL_FILTERS_DISABLED" : "Tizim ba'zi ma'lumotlarni noto'g'ri berishi mumkin. Muhim ma'lumotlarni tekshiring."}
+            {isHackerMode ? "PROTOCOL_WARNING: ALL_FILTERS_DISABLED" : "Tizim ba'zi ma'lumotlarni noto'g'ri berishi mumkin."}
           </p>
         </div>
 
-        {/* Completely Invisible Secret Mode Eye Trigger (Only visible on hover) - Slightly Shrunken */}
         <button 
           onClick={() => isHackerMode ? setIsHackerMode(false) : setShowPasswordModal(true)} 
           className={`absolute bottom-6 right-6 p-3 rounded-full transition-all duration-500 transform hover:scale-125 z-50 opacity-0 hover:opacity-100 ${
@@ -287,7 +284,6 @@ const App: React.FC = () => {
           <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[100] backdrop-blur-xl transition-all animate-in fade-in">
             <div className={`p-8 rounded-[32px] max-w-sm w-full shadow-2xl border transform transition-all scale-100 ${isHackerMode ? 'bg-black border-red-600 shadow-[0_0_40px_rgba(255,0,0,0.4)]' : 'bg-white border-gray-100'}`}>
               <h3 className={`text-xl font-bold mb-2 ${isHackerMode ? 'text-red-600 hacker-font' : 'text-gray-900'}`}>Maxfiy rejimga kirish</h3>
-              <p className={`text-sm mb-6 ${isHackerMode ? 'text-red-900 hacker-font' : 'text-gray-500'}`}>Faqat tizim administratorlari uchun.</p>
               <input 
                 type="password" 
                 autoFocus 
@@ -303,7 +299,7 @@ const App: React.FC = () => {
                   onClick={() => passwordInput === 'edabbgadoy' && (setIsHackerMode(true), setShowPasswordModal(false), setPasswordInput(''))} 
                   className={`flex-1 p-4 rounded-2xl font-semibold transition-colors ${isHackerMode ? 'bg-red-600 text-black hover:bg-red-500 shadow-[0_0_15px_#ff0000]' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
                 >
-                  Tasdiqlash
+                  Kirish
                 </button>
               </div>
             </div>

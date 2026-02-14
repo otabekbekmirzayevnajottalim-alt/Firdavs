@@ -78,9 +78,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
           ))}
         </div>
 
-        <div className={`pt-4 text-center mt-auto flex items-center justify-center gap-2 ${isHackerMode ? 'border-t border-red-900/30 text-red-900 hacker-font text-[9px]' : 'text-[#444746] text-[12px]'}`}>
-          <div className={`w-1.5 h-1.5 rounded-full ${isHackerMode ? 'bg-red-600 animate-pulse' : 'bg-green-500'}`} />
-          {isHackerMode ? 'SYSTEM_STATUS: SECURE' : 'NeyroPlan AI v3.0'}
+        <div className={`pt-4 text-center mt-auto flex flex-col items-center justify-center gap-1 ${isHackerMode ? 'border-t border-red-900/30 text-red-900 hacker-font' : 'text-[#444746]'}`}>
+          <div className="flex items-center gap-2">
+            <div className={`w-1.5 h-1.5 rounded-full ${isHackerMode ? 'bg-red-600 animate-pulse' : 'bg-green-500'}`} />
+            <span className="text-[10px]">{isHackerMode ? 'SECURE_API_ACTIVE' : 'NeyroPlan AI v3.0'}</span>
+          </div>
+          {isHackerMode && <div className="text-[7px] opacity-30">[VAULT_ACCESS_GRANTED]</div>}
         </div>
       </div>
     </div>
